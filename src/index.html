@@ -23,15 +23,21 @@
             margin-left: auto;
             margin-right: auto;
         }
+
         .results-found {
             margin: 24px;
             display: none;
         }
-        .results-found > p {
-            padding-bottom: 16px;
-            color: blue;
+
+        .results-found>p {        
+            color: gray;
         }
-        .results-found > a {
+
+        .results-found>a {
+            width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
             padding: 16px;
             background-color: burlywood;
             border: 2px solid black;
@@ -41,6 +47,29 @@
             font-size: 18px;
             font-weight: 500;
         }
+
+        .results-found>button {
+            margin-top: 24px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            padding: 16px;
+            background-color: rgb(100, 100, 242);
+            border: 2px solid black;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        p.error-text {
+            color: red;
+            font-size: 16px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
     </style>
 </head>
 
@@ -49,10 +78,13 @@
         <h1 class="headline">QR Code Scanner</h1>
         <div id="reader" class="m-6 max-w-md"></div>
         <div class="results-found">
-            <p>URL Found</p>
+            <p>URL Found:</p>
+            <p id="scanned-link"></p>
             <a href="#" target="_blank">Open URL</a>
+            <button id="re-scan-btn">Re-scan</a>
         </div>
-        
+        <p class="error-text"></p>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -64,15 +96,28 @@
             const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                 console.log(`Code matched = ${decodedText}`, decodedResult);
                 html5QrCode.stop();
+                $("#scanned-link").text(decodedText);
                 $(".results-found > a").attr("href", decodedText);
                 $(".results-found").css("display", "block");
             };
-
             const onScanFailure = (error) => {
-                console.warn(`Code scan error = ${error}`);
+                console.warn(`Failed to scan = ${error}`);
             }
             const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, onScanFailure);
+            const startScanning = () => {
+                $(".results-found, .error-text").css("display", "none");            
+                $("#scanned-link, .error-text").text(null);
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    qrCodeSuccessCallback,
+                    onScanFailure
+                ).catch(err => {
+                    $(".error-text").text(err).css("display", "block");
+                });
+            }
+            startScanning();
+            document.getElementById("re-scan-btn").addEventListener("click", startScanning);
         });
     </script>
 </body>

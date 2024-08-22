@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .headline {
+            margin: 24px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #reader {
+            margin: 24px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .results-found {
+            margin: 24px;
+            display: none;
+        }
+        .results-found > p {
+            padding-bottom: 16px;
+            color: blue;
+        }
+        .results-found > a {
+            padding: 16px;
+            background-color: burlywood;
+            border: 2px solid black;
+            border-radius: 6px;
+            text-decoration: none;
+            color: brown;
+            font-size: 18px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="headline">QR Code Scanner</h1>
+        <div id="reader" class="m-6 max-w-md"></div>
+        <div class="results-found">
+            <p>URL Found</p>
+            <a href="#" target="_blank">Open URL</a>
+        </div>
+        
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            const html5QrCode = new Html5Qrcode("reader");
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                console.log(`Code matched = ${decodedText}`, decodedResult);
+                html5QrCode.stop();
+                $(".results-found > a").attr("href", decodedText);
+                $(".results-found").css("display", "block");
+            };
+
+            const onScanFailure = (error) => {
+                console.warn(`Code scan error = ${error}`);
+            }
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, onScanFailure);
+        });
+    </script>
+</body>
+
+</html>

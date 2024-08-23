@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner</title>
+    <style>
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+            background-color: gray;
+            padding: 30px;
+        }
+
+        .headline {
+            margin: 24px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #reader {
+            margin: 24px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .results-found {
+            margin: 24px;
+            display: none;
+        }
+
+        .results-found>p {
+            color: gray;
+        }
+
+        .results-found>a {
+            width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            padding: 16px;
+            background-color: burlywood;
+            border: 2px solid black;
+            border-radius: 6px;
+            text-decoration: none;
+            color: brown;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .results-found>button {
+            margin-top: 24px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            padding: 16px;
+            background-color: rgb(100, 100, 242);
+            border: 2px solid black;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        p.error-text {
+            color: red;
+            font-size: 16px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="headline">QR Code Scanner</h1>
+        <div id="reader" class="m-6 max-w-md"></div>
+        <div class="results-found">
+            <p>URL Found:</p>
+            <p id="scanned-link"></p>
+            <a href="#" target="_blank">Open URL</a>
+            <button id="re-scan-btn">Re-scan</a>
+        </div>
+        <p class="error-text"></p>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            const html5QrCode = new Html5Qrcode("reader");
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                console.log(`Code matched = ${decodedText}`, decodedResult);
+                html5QrCode.stop();
+                $("#scanned-link").text(decodedText);
+                $(".results-found > a").attr("href", decodedText);
+                $(".results-found").css("display", "block");
+            };
+            const onScanFailure = (error) => {
+                console.warn(`Failed to scan = ${error}`);
+            }
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            const startScanning = () => {
+                $(".results-found, .error-text").css("display", "none");
+                $("#scanned-link, .error-text").text(null);
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    qrCodeSuccessCallback,
+                    onScanFailure
+                ).catch(err => {
+                    $(".error-text").text(err).css("display", "block");
+                });
+            }
+            startScanning();
+            document.getElementById("re-scan-btn").addEventListener("click", startScanning);
+        });
+    </script>
+</body>
+
+</html>
